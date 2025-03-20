@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import classNames from 'classnames';
 import 'bulma/css/bulma.css';
 import './App.scss';
 
@@ -26,15 +27,13 @@ enum SortType {
   Default,
 }
 
-function modify(goods: string[], { sortBy, isReversed }: SortStatus) {
-  let visibleGoods = [...goods];
+function sortGoods(goods: string[], { sortBy, isReversed }: SortStatus) {
+  const visibleGoods = [...goods];
 
   if (sortBy === SortType.Alphabet) {
     visibleGoods.sort((a, b) => a.localeCompare(b));
   } else if (sortBy === SortType.Length) {
     visibleGoods.sort((a, b) => a.length - b.length);
-  } else if (sortBy === SortType.Default) {
-    visibleGoods = [...goodsFromServer];
   }
 
   if (isReversed) {
@@ -48,18 +47,16 @@ export const App: React.FC = () => {
   const [sortBy, setSortBy] = useState(SortType.Default);
   const [isReversed, setReversed] = useState(false);
 
-  const goods = modify(goodsFromServer, { sortBy, isReversed });
+  const goods = sortGoods(goodsFromServer, { sortBy, isReversed });
 
   return (
     <div className="section content">
       <div className="buttons">
         <button
           type="button"
-          className={
-            sortBy === SortType.Alphabet
-              ? 'button is-info'
-              : 'button is-info is-light'
-          }
+          className={classNames('button', 'is-info', {
+            'is-light': sortBy !== SortType.Alphabet,
+          })}
           onClick={() => setSortBy(SortType.Alphabet)}
         >
           Sort alphabetically
@@ -67,11 +64,9 @@ export const App: React.FC = () => {
 
         <button
           type="button"
-          className={
-            sortBy === SortType.Length
-              ? 'button is-success'
-              : 'button is-success is-light'
-          }
+          className={classNames('button', 'is-success', {
+            'is-light': sortBy !== SortType.Length,
+          })}
           onClick={() => setSortBy(SortType.Length)}
         >
           Sort by length
@@ -79,10 +74,10 @@ export const App: React.FC = () => {
 
         <button
           type="button"
-          className={
-            isReversed ? 'button is-warning' : 'button is-warning is-light'
-          }
-          onClick={() => setReversed(stat => !stat)}
+          className={classNames('button', 'is-warning', {
+            'is-light': !isReversed,
+          })}
+          onClick={() => setReversed(prev => !prev)}
         >
           Reverse
         </button>
